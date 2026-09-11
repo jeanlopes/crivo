@@ -20,6 +20,10 @@ layers:
     rules:
       zero_suppressions: true
       no_swallow: true          # broad catch/except without re-raise or RULE- reference
+      no_unbounded_call: true       # AP-049 (P10)
+      no_unbounded_resource: true   # AP-054 (P10)
+      retry_requires_jitter: true   # AP-060 (P10)
+      no_walltime_ordering: true    # AP-037 (P10)
 
   - id: unit
     kind: gate
@@ -52,6 +56,44 @@ layers:
       main_sequence_distance: 0.3
     emits:
       - dependency_graph            # used by scoring for blast radius
+
+  - id: architecture
+    kind: gate
+    after: structure                # consumes structure.emits.dependency_graph
+    description: Architecture decision records (P10). Gates the record, never the decision.
+    principles_dir: principles
+    decisions_dir: decisions
+    blast_radius_trigger: 10
+    significance_triggers:          # 1-7 are mandatory; projects MAY add, MUST NOT remove (P10)
+      - cross_boundary_dependency
+      - new_integration_point
+      - published_contract_change
+      - system_of_record_change
+      - consistency_boundary_change
+      - nondeterministic_component_change
+      - resilience_policy_change
+      - top_level_module_lifecycle
+      - blast_radius_above_trigger
+      - new_runtime_dependency_in_required_dirs
+    rules:
+      adr_required_on_trigger: true
+      axes_complete: true
+      alternatives_non_empty: true          # AP-006
+      violation_requires_reason: true
+      violation_requires_revisit: true
+      expired_revisit_fails: true           # design-debt ratchet, P10
+      dead_principle_reference: true
+      dead_adr_reference: true
+      supersession_acyclic: true
+      contract_compat: true                 # AP-064, AP-068
+      degradation_scenario_required: true   # AP-062
+    checks:
+      - principles/check.sh
+    emits:
+      - adr_coverage                        # navigability gradient
+      - open_violations                     # derived ledger, rebuilt from decisions/
+      - expired_revisits
+      - axis_traversal_completeness
 
   - id: mutation
     kind: gradient
@@ -136,6 +178,7 @@ schedule:
   quarterly:
     - comment_judge_random_sample_10pct
     - recalibrate_weights
+    - architecture_boundary_review          # AP-070; outcome is an ADR, including "nothing changed"
 
 evidence:
   output: evidence/EVIDENCE.md

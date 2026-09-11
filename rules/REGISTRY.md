@@ -21,6 +21,7 @@ Body: the full explanation, edge cases, why the rule exists, what would break wi
 
 ## Checks (`comments` layer)
 - Every `RULE-` referenced in code exists in the registry.
+- Every `adr:` and every `ADR-` referenced in code resolves in `decisions/` (P10, `architecture` layer).
 - Every `sites` entry contains a `RULE-nnn` comment.
 - Registry coverage = rules with all sites marked / rules total (navigability gradient).
 - A rule referenced from ≥ 5 files is flagged `dispersed` — a candidate for extraction into a module.
