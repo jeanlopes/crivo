@@ -1,0 +1,17 @@
+# Protected path (P06). Changing weights requires an entry in calibration/CHANGELOG.md.
+confidence:
+  coverage:            0.15
+  mutation:            0.30
+  spec_to_test:        0.15
+  property:            0.10
+  traced:              0.10
+  flaky_inverse:       0.10
+  adversary_inverse:   0.10
+  llm_eval_lower:      0.15   # only when llm-eval layer present; others renormalized
+navigability:
+  redundancy_inverse:  0.20
+  length_compliance:   0.15
+  stale_inverse:       0.15
+  registry_coverage:   0.25
+  docs_header_cov:     0.15
+  doc_stale_inverse:   0.10

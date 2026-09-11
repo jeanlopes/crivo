@@ -1,0 +1,143 @@
+# crivo gauntlet — declarative pipeline definition.
+# Protected path (P06). Agents MUST NOT edit this file.
+#
+# kind: gate      -> binary; failure halts and zeroes the confidence index
+# kind: gradient  -> value in [0,1]; enters the confidence index; optional `min` also halts
+# Each layer writes .crivo/results/<id>.json  {"id","status":"pass|fail","metric":<float|null>,"details":{}}
+
+version: 1
+results_dir: .crivo/results
+fail_fast: true
+
+layers:
+  - id: types
+    kind: gate
+    description: Static typing in strict mode. Zero errors.
+
+  - id: lint
+    kind: gate
+    description: Linters with zero suppressions unless each carries a RULE- or issue reference.
+    rules:
+      zero_suppressions: true
+      no_swallow: true          # broad catch/except without re-raise or RULE- reference
+
+  - id: unit
+    kind: gate
+    description: Unit tests, randomized order, repeated to detect flakiness.
+    opts:
+      random_order: true
+      repeat: 3
+      skip_requires_issue: true
+      assertion_count_ratchet: true   # assertion count may not decrease without SPEC amendment
+    emits:
+      - flaky_rate
+      - spec_to_test_mapping        # fraction of spec/features scenarios with >=1 linked test
+
+  - id: coverage
+    kind: gradient
+    metric: changed_line_coverage
+    min: 0.90
+    description: Line+branch coverage on lines changed in the diff. Global coverage is reported, not gated.
+
+  - id: structure
+    kind: gate
+    description: Structural metrics and architecture rules.
+    thresholds:
+      cyclomatic_per_function: 10
+      cognitive_per_function: 15
+      function_lines: 40
+      module_lines: 400
+      duplication_pct: 3
+      arch_violations: 0
+      main_sequence_distance: 0.3
+    emits:
+      - dependency_graph            # used by scoring for blast radius
+
+  - id: mutation
+    kind: gradient
+    metric: mutation_score
+    min: 0.85
+    scope: diff                     # full on schedule (see schedule below)
+    description: Surviving mutants must each be classified equivalent | accepted-risk:#issue | unresolved. unresolved>0 fails.
+    secondary_oracle: traced        # kills obtained via trajectory divergence reported separately
+    emits:
+      - mutation_kills_by_trajectory
+
+  - id: property
+    kind: gradient
+    metric: invariants_covered      # fraction of spec invariants with a property test
+    min: 0.80
+
+  - id: traced
+    kind: gradient
+    metric: trajectory_match
+    min: 1.0                        # any assert-class divergence fails
+    golden_dir: traced/golden
+    granularity: contract
+    description: Golden trajectory comparison. Reports first divergence on failure.
+
+  - id: comments
+    kind: gate
+    description: Deterministic comment checks (P07). Gradients feed the navigability index.
+    banned_phrases: comments/banned-phrases.txt
+    emits:
+      - lexical_redundancy
+      - length_compliance
+      - stale_suspects
+      - registry_coverage
+      - density
+
+  - id: docs
+    kind: gate
+    description: Bidirectional doc/code linkage (P08).
+    required_dirs: [src/domain, src/core]
+    complexity_overflow_pct: 50
+    emits:
+      - orphan_docs
+      - doc_stale_suspects
+      - header_coverage
+
+  - id: e2e
+    kind: gate
+    real_execution: true
+    description: Gherkin scenarios executed against the running system with real dependencies. No mocks.
+
+  - id: security
+    kind: gate
+    checks: [sast, secrets, dependency_audit]
+
+  - id: llm-eval
+    kind: gradient
+    metric: pass_rate_lower_wilson
+    min: 0.90
+    optional: true                  # required when the project declares llm components
+    opts:
+      runs_per_sample: 5
+      pass_k: 4
+      ratchet: true
+      pr_subset: 0.2
+    description: See P09.
+
+  - id: adversary
+    kind: gradient
+    metric: unresolved_findings_inverse   # 1 - normalized unresolved findings; unresolved>0 also fails
+    min: 1.0
+    separate_context: true
+    read_only: true
+    prefer_different_model: true
+
+schedule:
+  nightly:
+    - { id: mutation, scope: full }
+    - { id: llm-eval, opts: { pr_subset: 1.0 } }
+  weekly:
+    - comment_judge_stale_suspects
+    - doc_judge_stale_suspects
+  quarterly:
+    - comment_judge_random_sample_10pct
+    - recalibrate_weights
+
+evidence:
+  output: evidence/EVIDENCE.md
+  template: evidence/EVIDENCE-TEMPLATE.md
+  fresh_run_required: true

@@ -1,0 +1,4 @@
+.crivo/
+!.crivo/hooks/
+__pycache__/
+node_modules/

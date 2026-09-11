@@ -1,0 +1,17 @@
+# TypeScript adapter — concrete commands per layer. Merge over ../../layers.yaml.
+stack: typescript
+layers:
+  types:      { cmd: "tsc --noEmit --strict" }
+  lint:       { cmd: "eslint . --max-warnings 0 && crivo-checks suppressions", note: "complexity rule set to 10 in eslint config" }
+  unit:       { cmd: "crivo-checks repeat 3 -- vitest run --sequence.shuffle --retry 0 --reporter=json --outputFile=.crivo/results/unit.json" }
+  coverage:   { cmd: "vitest run --coverage --coverage.reporter=json && crivo-checks changed-line-coverage --min 0.90" }
+  structure:  { cmd: "depcruise --config .dependency-cruiser.cjs src && crivo-checks structure" }
+  mutation:   { cmd: "stryker run --incremental" }
+  property:   { cmd: "vitest run --project property", note: "fast-check" }
+  traced:     { cmd: "crivo-trace run --granularity contract --golden traced/golden", note: "node inspector Debugger domain; logpoints" }
+  comments:   { cmd: "crivo-checks comments src" }
+  docs:       { cmd: "crivo-checks docs src docs" }
+  e2e:        { cmd: "docker compose -f compose.e2e.yml up -d && cucumber-js && playwright test && docker compose down" }
+  security:   { cmd: "semgrep --config auto src && gitleaks detect && npm audit --audit-level=high" }
+  llm-eval:   { cmd: "promptfoo eval -c evals/golden.yaml --repeat 5" }
+  adversary:  { cmd: "crivo-adversary review --spec spec/ --diff origin/main --model $ADVERSARY_MODEL" }

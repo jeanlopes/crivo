@@ -1,0 +1,5 @@
+id: P-0001
+category: boundary
+expected_layer: mutation
+description: ">= replaced by > in overlap check; output unchanged for all example tests, intermediate state differs."
+patch: P-0001-off-by-one-boundary.patch

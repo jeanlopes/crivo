@@ -1,0 +1,17 @@
+# Python adapter — concrete commands per layer. Merge over ../../layers.yaml.
+stack: python
+layers:
+  types:      { cmd: "mypy --strict src" }
+  lint:       { cmd: "ruff check src tests && python -m crivo.checks.suppressions src" }
+  unit:       { cmd: "pytest -p randomly --count=3 --json-report --json-report-file=.crivo/results/unit.json" }
+  coverage:   { cmd: "pytest --cov=src --cov-branch --cov-report=json:.crivo/cov.json && diff-cover .crivo/cov.json --fail-under=90" }
+  structure:  { cmd: "radon cc -s -n C src --json > .crivo/cc.json && python -m crivo.checks.structure && lint-imports" }
+  mutation:   { cmd: "mutmut run --paths-to-mutate $(git diff --name-only origin/main -- 'src/*.py' | tr '\\n' ',') && mutmut results --json > .crivo/results/mutation.json" }
+  property:   { cmd: "pytest -m property", note: "Hypothesis; invariants tagged @pytest.mark.property and referenced by INV- id in spec/" }
+  traced:     { cmd: "crivo-trace run --granularity contract --golden traced/golden", note: "sys.monitoring (3.12+) tracer" }
+  comments:   { cmd: "python -m crivo.checks.comments src" }
+  docs:       { cmd: "python -m crivo.checks.docs src docs" }
+  e2e:        { cmd: "docker compose -f compose.e2e.yml up -d && behave features/ && docker compose down" }
+  security:   { cmd: "semgrep --config auto src && gitleaks detect && pip-audit" }
+  llm-eval:   { cmd: "inspect eval evals/golden.py --model $MODEL --epochs 5", note: "Inspect (UK AISI); provider-agnostic" }
+  adversary:  { cmd: "crivo-adversary review --spec spec/ --diff origin/main --model $ADVERSARY_MODEL" }

@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: crivo-protect-paths
+        name: crivo P06 protected paths
+        entry: .crivo/hooks/protect-paths.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+      - id: crivo-comments
+        name: crivo P07 comment checks
+        entry: comments/check.sh
+        language: script
+        files: \.(py|ts|tsx|js|rs|cs)$

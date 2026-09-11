@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crivo.dev/schema/frame.json",
+  "title": "crivo trajectory frame",
+  "type": "object",
+  "required": ["seq", "event", "fn", "file"],
+  "properties": {
+    "seq": { "type": "integer", "minimum": 0 },
+    "event": { "enum": ["header", "enter", "exit", "raise", "line"] },
+    "fn": { "type": "string" },
+    "file": { "type": "string" },
+    "line": { "type": "integer" },
+    "args": { "type": "object" },
+    "locals": { "type": "object" },
+    "ret": {},
+    "exc": { "type": "object", "properties": { "type": { "type": "string" }, "message": { "type": "string" } } },
+    "self_delta": {
+      "type": "object",
+      "additionalProperties": { "type": "array", "minItems": 2, "maxItems": 2 }
+    },
+    "depth": { "type": "integer", "minimum": 0 },
+    "thread": { "type": "string", "pattern": "^<thr:\\d+>$" },
+    "test_id": { "type": "string" },
+    "granularity": { "enum": ["contract", "full"] },
+    "tracer": { "type": "string" },
+    "schema": { "type": "string" },
+    "created": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

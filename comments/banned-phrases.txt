@@ -1,0 +1,31 @@
+# Signatures of uncurated generated prose. Case-insensitive. Gate: any match fails.
+this function
+this method
+this class
+this module
+this helper
+helper function that
+note that
+it is important to
+it's important to
+it is worth noting
+essentially
+basically
+simply
+in order to
+this is used to
+is responsible for
+handles the
+the purpose of this
+as the name suggests
+the following code
+we first
+we then
+here we
+let's
+make sure to
+please note
+# markdown artifacts inside code comments
+^\s*(#|//|\*)\s*#{1,6}\s
+^\s*(#|//|\*)\s*[-*]\s+\*\*
+\*\*[^*]+\*\*

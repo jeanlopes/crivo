@@ -1,0 +1,50 @@
+# Reference GitHub Actions workflow. Generated from gauntlet/layers.yaml in the target repo;
+# layers listed explicitly here so the order is visible. Protected path (P06).
+name: crivo
+on:
+  pull_request:
+  push: { branches: [main] }
+  schedule:
+    - cron: "0 3 * * *"     # nightly: full mutation, full llm-eval
+    - cron: "0 4 * * 1"     # weekly: stale comment/doc judges
+
+jobs:
+  gauntlet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, lfs: true }
+      - name: Install crivo
+        run: pipx install crivo   # or: npm i -g crivo
+      - name: Gauntlet (fail-fast, ordered)
+        run: crivo run --layers types,lint,unit,coverage,structure,mutation,property,traced,comments,docs,e2e,security,llm-eval,adversary
+        env:
+          ADVERSARY_MODEL: ${{ vars.ADVERSARY_MODEL }}
+      - name: Score
+        run: python scoring/calc/crivo_score.py
+      - name: Evidence (fresh run)
+        if: success()
+        run: crivo run --evidence
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crivo-evidence
+          path: |
+            evidence/EVIDENCE.md
+            .crivo/score.json
+            .crivo/results/
+
+  nightly:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: crivo run --layer mutation --scope full
+      - run: crivo run --layer llm-eval --subset 1.0
+
+  weekly-judges:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 4 * * 1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: crivo judge comments --stale-suspects --open-pr
+      - run: crivo judge docs --stale-suspects --open-pr

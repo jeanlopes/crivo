@@ -1,0 +1,11 @@
+# Protected paths (P06) require human review.
+/spec/                     @<human>
+/gauntlet/                 @<human>
+/traced/golden/            @<human>
+/rules/                    @<human>
+/scoring/                  @<human>
+/.github/workflows/        @<human>
+/AGENTS.md                 @<human>
+/CLAUDE.md                 @<human>
+/CODEOWNERS                @<human>
+/.pre-commit-config.yaml   @<human>

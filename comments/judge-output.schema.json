@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "crivo comment judge finding",
+  "type": "object",
+  "required": ["comment_id", "class", "truth", "value", "action"],
+  "properties": {
+    "comment_id": { "type": "string", "description": "<file>:<line>" },
+    "class": { "enum": ["api", "rule", "reference", "marker", "todo", "narration", "commented-code", "inline", "unknown"] },
+    "truth": { "enum": ["true", "partial", "false", "unverifiable"] },
+    "value": { "enum": ["why", "what", "none"] },
+    "finding": { "type": "string", "maxLength": 400 },
+    "action": { "enum": ["keep", "fix-comment", "fix-code", "delete"] },
+    "proposed_text": { "type": "string", "maxLength": 300 },
+    "evidence": { "type": "string", "description": "code lines or registry entry supporting the verdict" }
+  },
+  "additionalProperties": false
+}
