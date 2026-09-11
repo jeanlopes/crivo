@@ -17,6 +17,8 @@ spec/**                    SPEC, Gherkin features, invariants
 gauntlet/**                layers.yaml, thresholds, adapters
 traced/golden/**           golden trajectories
 rules/**                   rules registry
+principles/**              architecture principles corpus
+decisions/**               architecture decision records
 scoring/**                 weights and calibration data
 .github/workflows/**       CI definition
 AGENTS.md, CLAUDE.md       agent instructions

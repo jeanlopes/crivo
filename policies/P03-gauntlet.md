@@ -9,7 +9,7 @@ Layers MUST run in the order declared in `layers.yaml`. The pipeline MUST halt a
 ## Canonical order
 
 ```
-types → lint → unit → coverage → structure → mutation → property → traced → comments → docs → e2e → security → llm-eval → adversary
+types → lint → unit → coverage → structure → architecture → mutation → property → traced → comments → docs → e2e → security → llm-eval → adversary
 ```
 
 ## The EVIDENCE report
@@ -21,6 +21,7 @@ After the final layer passes, the pipeline MUST produce `evidence/EVIDENCE.md` f
 - Per-layer result, metric value, threshold.
 - Surviving mutants with a one-line classification each (`equivalent` / `accepted-risk:#issue` / `unresolved`). `unresolved` > 0 is a gate failure.
 - Golden trajectories created, updated, or diverged.
+- Architecture decisions in the change, and the violation ledger with any expired revisit trigger (P10).
 - Adversarial findings, each `resolved` / `accepted:#issue` / `unresolved`. `unresolved` > 0 is a gate failure.
 - The confidence index before and after.
 

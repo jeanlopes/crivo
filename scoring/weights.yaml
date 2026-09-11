@@ -9,9 +9,10 @@ confidence:
   adversary_inverse:   0.10
   llm_eval_lower:      0.15   # only when llm-eval layer present; others renormalized
 navigability:
-  redundancy_inverse:  0.20
-  length_compliance:   0.15
-  stale_inverse:       0.15
-  registry_coverage:   0.25
-  docs_header_cov:     0.15
-  doc_stale_inverse:   0.10
+  redundancy_inverse:  0.18
+  length_compliance:   0.12
+  stale_inverse:       0.12
+  registry_coverage:   0.22
+  docs_header_cov:     0.13
+  doc_stale_inverse:   0.08
+  adr_coverage:        0.15   # P10

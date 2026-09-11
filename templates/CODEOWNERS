@@ -3,6 +3,8 @@
 /gauntlet/                 @<human>
 /traced/golden/            @<human>
 /rules/                    @<human>
+/principles/               @<human>
+/decisions/                @<human>
 /scoring/                  @<human>
 /.github/workflows/        @<human>
 /AGENTS.md                 @<human>

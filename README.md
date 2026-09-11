@@ -17,6 +17,7 @@
 |---|---|
 | The [SPEC](spec/SPEC-TEMPLATE.md): a test plan and Gherkin scenarios | The [EVIDENCE](evidence/EVIDENCE-TEMPLATE.md) report from one clean run |
 | The [rules registry](rules/REGISTRY.md) entries the change touches | The confidence index delta |
+| The [ADR](decisions/ADR-TEMPLATE.md), when the change is architecturally significant | The violation ledger, and any revisit trigger that came due |
 | — | Golden trajectory diffs, when a traced test diverged |
 | — | Adversarial reviewer findings |
 
@@ -39,6 +40,8 @@ evidence/     EVIDENCE report template
 scoring/      confidence index: formula, reference calculator, calibration protocol
 traced/       trajectory format, normalization rules, MCP debugger server design
 rules/        rules registry format and template
+principles/   90 architecture principles, AP-001–AP-090, by axis of decision
+decisions/    ADR registry and template — the record P10 gates
 comments/     banned phrases, judge output schema
 templates/    AGENTS.md, CI workflow, protected-path hooks, CODEOWNERS
 rationale/    why — essays, not policy
@@ -49,7 +52,7 @@ rationale/    why — essays, not policy
 1. Copy `templates/AGENTS.md` to your project root (or `CLAUDE.md`).
 2. Copy `templates/hooks/` and `templates/CODEOWNERS`, adjust paths. **Do this first** — without protected paths nothing else is real.
 3. Copy `gauntlet/layers.yaml` and the adapter for your stack; fill in commands.
-4. Write your first `spec/features/*.feature`. Approve it. Let the agent go.
+4. Write your first `spec/features/*.feature`. Approve it. Let the agent go. If the change fires a significance trigger ([P10](policies/P10-architecture-decisions.md)), approve the ADR too.
 5. Read `evidence/EVIDENCE.md` when it comes back. Not the diff.
 
 ## Status

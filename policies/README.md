@@ -11,5 +11,6 @@
 | [P07](P07-comments.md) | Comments | `comments` layer, judge |
 | [P08](P08-docs-linkage.md) | Docs linkage | `docs` layer, judge |
 | [P09](P09-nondeterministic.md) | Non-deterministic components | `llm-eval` layer |
+| [P10](P10-architecture-decisions.md) | Architecture decisions | `architecture` layer; `principles/`, `decisions/` |
 
 Language: RFC 2119. Every normative statement names its enforcement mechanism. If it cannot, it is not a policy.
