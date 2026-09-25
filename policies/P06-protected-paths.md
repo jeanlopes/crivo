@@ -19,11 +19,15 @@ traced/golden/**           golden trajectories
 rules/**                   rules registry
 principles/**              architecture principles corpus
 decisions/**               architecture decision records
+security/**                security controls catalogue, rules and checks (P11)
 scoring/**                 weights and calibration data
 .github/workflows/**       CI definition
 AGENTS.md, CLAUDE.md       agent instructions
 CODEOWNERS
 .pre-commit-config.yaml
+.semgrepignore, .gitleaks.toml, .gitleaksignore, .trivyignore*, osv-scanner.toml,
+.snyk, .nsprc, audit-ci.json*, deny.toml, zap-rules.tsv
+                           scanner configuration and ignore files (P11, SEC-148)
 ```
 
 Projects MAY extend this list. Projects MUST NOT shorten it.
@@ -31,6 +35,8 @@ Projects MAY extend this list. Projects MUST NOT shorten it.
 ## Why this policy comes first
 
 An agent that struggles to pass a gate will, given the ability, adjust the gate. Every other policy in this repository assumes it cannot. Set this up before anything else.
+
+Scanner configuration is a gate too. An ignore file is a threshold written as a list of exceptions; an agent that can add a line to `.gitleaksignore` has lowered the `secrets` gate to zero for that secret (P11).
 
 ## Proposing changes to protected paths
 

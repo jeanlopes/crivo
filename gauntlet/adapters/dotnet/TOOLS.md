@@ -11,4 +11,4 @@
 | property | FsCheck / CsCheck |
 | traced | `EventPipe` / `DiagnosticSource` tracer; `netcoredbg` for investigation (not `vsdbg` — its license restricts use outside Microsoft tooling) |
 | e2e | Reqnroll (SpecFlow successor) |
-| security | `dotnet list package --vulnerable`, `semgrep`, `gitleaks` |
+| security | `dotnet list package --vulnerable --include-transitive`, `semgrep` + `security/semgrep`, `gitleaks`, `osv-scanner`, `syft`, `trivy config`, `zizmor`, `security/checks/headers.sh`, ZAP baseline, `schemathesis` (P11) |

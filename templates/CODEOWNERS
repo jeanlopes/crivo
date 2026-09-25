@@ -5,9 +5,21 @@
 /rules/                    @<human>
 /principles/               @<human>
 /decisions/                @<human>
+/security/                 @<human>
 /scoring/                  @<human>
 /.github/workflows/        @<human>
 /AGENTS.md                 @<human>
 /CLAUDE.md                 @<human>
 /CODEOWNERS                @<human>
 /.pre-commit-config.yaml   @<human>
+# Scanner configuration and ignore files (P11, SEC-148)
+.semgrepignore             @<human>
+.gitleaks.toml             @<human>
+.gitleaksignore            @<human>
+.trivyignore*              @<human>
+osv-scanner.toml           @<human>
+.snyk                      @<human>
+.nsprc                     @<human>
+audit-ci.json*             @<human>
+deny.toml                  @<human>
+zap-rules.tsv              @<human>

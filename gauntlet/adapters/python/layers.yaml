@@ -12,6 +12,21 @@ layers:
   comments:   { cmd: "python -m crivo.checks.comments src" }
   docs:       { cmd: "python -m crivo.checks.docs src docs" }
   e2e:        { cmd: "docker compose -f compose.e2e.yml up -d && behave features/ && docker compose down" }
-  security:   { cmd: "semgrep --config auto src && gitleaks detect && pip-audit" }
+  security:
+    note: "P11. E2E_URL is the deployment started by the e2e layer. ZAP rules and scanner ignore files are protected paths."
+    checks:
+      sast:         "semgrep scan --error --metrics=off --config p/owasp-top-ten --config p/python --config p/jwt --config security/semgrep src && bandit -r src -q -ll"
+      secrets:      "gitleaks git --redact --log-opts=origin/main..HEAD"
+      sca:          "osv-scanner scan source --recursive . && pip-audit --strict"
+      sca_policy:   "crivo-checks dependency-policy --require-lockfile --frozen-install 'uv sync --locked' --min-age-days 7"
+      suppressions: "security/checks/suppressions.sh src"
+      catalogue:    "security/check.sh"
+      headers:      "security/checks/headers.sh $E2E_URL"
+      sbom:         "syft scan dir:. -o cyclonedx-json=.crivo/results/sbom.cdx.json"
+      iac:          "trivy config --severity HIGH,CRITICAL --exit-code 1 ."
+      ci:           "zizmor .github/workflows && actionlint"
+      dast:         "docker run --rm --network host -v $PWD/.crivo:/zap/wrk ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t $E2E_URL -c zap-rules.tsv -J zap.json"
+      fuzz:         "schemathesis run $E2E_URL/openapi.json --checks all"
+      abuse:        "behave --tags=@security features/ && python -m crivo.checks.abuse_coverage spec/"
   llm-eval:   { cmd: "inspect eval evals/golden.py --model $MODEL --epochs 5", note: "Inspect (UK AISI); provider-agnostic" }
   adversary:  { cmd: "crivo-adversary review --spec spec/ --diff origin/main --model $ADVERSARY_MODEL" }

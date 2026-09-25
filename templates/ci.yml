@@ -1,19 +1,23 @@
 # Reference GitHub Actions workflow. Generated from gauntlet/layers.yaml in the target repo;
 # layers listed explicitly here so the order is visible. Protected path (P06).
+# P11: actions pinned by commit SHA (SEC-100); read-only token, no persisted credentials (SEC-101).
 name: crivo
 on:
   pull_request:
   push: { branches: [main] }
   schedule:
-    - cron: "0 3 * * *"     # nightly: full mutation, full llm-eval
-    - cron: "0 4 * * 1"     # weekly: stale comment/doc judges
+    - cron: "0 3 * * *"     # nightly: full mutation, full llm-eval, security on the default branch
+    - cron: "0 4 * * 1"     # weekly: stale comment/doc judges, production header check
+
+permissions:
+  contents: read
 
 jobs:
   gauntlet:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0, lfs: true }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { fetch-depth: 0, lfs: true, persist-credentials: false }
       - name: Install crivo
         run: pipx install crivo   # or: npm i -g crivo
       - name: Gauntlet (fail-fast, ordered)
@@ -25,7 +29,7 @@ jobs:
       - name: Evidence (fresh run)
         if: success()
         run: crivo run --evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: crivo-evidence
           path: |
@@ -36,15 +40,32 @@ jobs:
   nightly:
     if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * *'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write            # new findings open issues with P11 deadlines
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
       - run: crivo run --layer mutation --scope full
       - run: crivo run --layer llm-eval --subset 1.0
+      - run: crivo run --layer security --checks sca,secrets_full_history,fuzz --scope full --open-issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: crivo run --layer security --checks dast_active --target staging --min-level 3
 
   weekly-judges:
     if: github.event_name == 'schedule' && github.event.schedule == '0 4 * * 1'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write          # the judges open PRs
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - run: crivo run --layer security --checks headers --target production_inventory
       - run: crivo judge comments --stale-suspects --open-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: crivo judge docs --stale-suspects --open-pr
+        env:
+          GH_TOKEN: ${{ github.token }}

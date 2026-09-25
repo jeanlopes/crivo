@@ -1,0 +1,11 @@
+# crivo custom rules for HTML templates (P11).
+rules:
+  - id: crivo.sec-029.third-party-script-without-sri
+    message: Third-party script or stylesheet without Subresource Integrity (SEC-029). Self-host it or add integrity= and crossorigin.
+    severity: ERROR
+    languages: [generic]
+    paths: { include: ["*.html", "*.htm", "*.hbs", "*.ejs", "*.njk", "*.jinja", "*.jinja2", "*.vue", "*.svelte", "*.astro"] }
+    metadata: { control: SEC-029, cwe: "CWE-353" }
+    pattern-either:
+      - pattern-regex: '<script\b(?![^>]*\bintegrity=)[^>]*\bsrc=["'']?(https?:)?//[^>]*>'
+      - pattern-regex: '<link\b(?=[^>]*\brel=["'']?stylesheet)(?![^>]*\bintegrity=)[^>]*\bhref=["'']?(https?:)?//[^>]*>'

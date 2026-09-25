@@ -25,8 +25,26 @@ Generated from **one fresh run**. All numbers below come from that run and nothi
 | comments | gate | pass | — | — |
 | docs | gate | pass | — | — |
 | e2e | gate | pass | 9/9 scenarios · real DB | — |
-| security | gate | pass | 0 findings | 0 |
+| security | gate | pass | level 2 · 0 crit/high · 0 overdue | 0 · 0 |
 | adversary | gradient | pass | 0 unresolved | 0 |
+
+## Security (P11)
+Triggers fired: 1 (new route), 5 (redirect handling) · Domains: 2, 4, 5 · Threat-model delta: approved
+
+| Check | Result | Detail |
+|---|---|---|
+| sast | pass | 0 errors · rules: registry + `security/semgrep` (20) |
+| secrets | pass | 0 |
+| sca | pass | 0 crit/high · 0 KEV · 2 medium → #311, #312 · new deps: 0 |
+| sbom | pass | `.crivo/results/sbom.cdx.json` · 412 components |
+| iac · ci | pass | 0 · 0 (all actions SHA-pinned) |
+| headers | pass | CSP strict · HSTS · CORS probe clean · no source maps |
+| dast · fuzz | pass | ZAP baseline 0 FAIL · 1 840 generated requests, 0 5xx |
+| abuse | pass | 9/9 `@security` scenarios · authz matrix 48/48 cells · public routes 3 = manifest |
+| suppressions | pass | 0 unreferenced |
+
+Control coverage (applicable controls with a passing mechanism): 71/74 · verified only by `config` evidence: 12 · only by `adversary`: 3
+Open exceptions: 0 · Findings past deadline: **0**
 
 ## Surviving mutants
 | Mutant | Location | Classification |
@@ -45,9 +63,9 @@ Violation ledger: <n> open · <n> due within 90 days · **0 expired**
 - updated: none · diverged: none
 
 ## Adversarial findings
-| # | Severity | Location | Claim | Status |
-|---|---|---|---|---|
-| — | | | | |
+| # | Severity | Control | Location | Attack | Status |
+|---|---|---|---|---|---|
+| — | | | | | |
 
 ## Spec → test mapping
 3/3 scenarios mapped.
