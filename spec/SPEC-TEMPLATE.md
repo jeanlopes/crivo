@@ -25,6 +25,14 @@ Properties that must hold for all inputs. Each gets a property test.
 ## Traced tests
 Which tests record a golden trajectory at `contract` granularity, and which paths are `assert` vs `observe` (P05).
 
+## Security (P11)
+Required when the change fires a security trigger (the `security` layer computes them from the diff). Template: `security/THREAT-MODEL-TEMPLATE.md`, section *Per-SPEC*.
+
+- Triggers fired: <list>
+- Domains touched and, per control, `applies` (with how it is verified) / `not-applicable` (one line) / `exception` (entry in `spec/security/exceptions.yaml`).
+- Abuse cases — answer all three: how would a **malicious user**, a **malicious tenant**, and a **bot** misuse this? Each answer is an `@security` scenario in `features/`, tagged with its `SEC-nnn`.
+- Authorization matrix rows added or changed in `spec/security/authz-matrix`; routes added to `spec/security/public-routes`, with the reason.
+
 ## Non-deterministic components (P09)
 None | dataset `spec/llm/<name>.jsonl`, N=5, k=4, scorer: <schema|judge>.
 

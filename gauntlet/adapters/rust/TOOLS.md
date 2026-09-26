@@ -11,4 +11,4 @@
 | property | `proptest` |
 | traced | `tracing` subscriber emitting frames; `lldb-dap` for investigation |
 | e2e | `cucumber-rs` |
-| security | `cargo audit`, `cargo deny`, `semgrep`, `gitleaks` |
+| security | `cargo audit`, `cargo deny check` (advisories, bans, sources), `semgrep` + `security/semgrep`, `gitleaks`, `osv-scanner`, `syft`, `trivy config`, `zizmor`, `security/checks/headers.sh`, ZAP baseline, `schemathesis` (P11) |

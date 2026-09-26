@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head>
+<!-- ruleid: crivo.sec-029.third-party-script-without-sri -->
+<script src="https://cdn.example.com/lib.min.js"></script>
+<!-- ok: crivo.sec-029.third-party-script-without-sri -->
+<script src="https://cdn.example.com/lib.min.js" integrity="sha384-abc" crossorigin="anonymous"></script>
+<!-- ok: crivo.sec-029.third-party-script-without-sri -->
+<script src="/static/app.js"></script>
+<!-- ruleid: crivo.sec-029.third-party-script-without-sri -->
+<link rel="stylesheet" href="https://fonts.example.com/font.css">
+</head>
+</html>

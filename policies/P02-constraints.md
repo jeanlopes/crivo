@@ -13,11 +13,11 @@ Every constraint on agent-produced code MUST be expressed as a layer in `gauntle
 
 ## Mandatory layers
 
-A conforming project MUST run, in this order: `types`, `lint`, `unit`, `coverage`, `structure`, `mutation`, `e2e`, `security`. It SHOULD run `property`, `traced`, `comments`, `docs`, `adversary`. Projects with LLM components MUST run `llm-eval` (P09).
+A conforming project MUST run, in this order: `types`, `lint`, `unit`, `coverage`, `structure`, `mutation`, `e2e`, `security` (at the P11 level the project declares). It SHOULD run `property`, `traced`, `comments`, `docs`, `adversary`. Projects with LLM components MUST run `llm-eval` (P09).
 
 ## Rules for all layers
 
-- Suppressions (`#[allow]`, `# noqa`, `# type: ignore`, `eslint-disable`, `#pragma warning disable`, `@ts-ignore`) MUST be zero unless each carries a `RULE-` or issue reference (P07). Enforced by `lint`.
+- Suppressions (`#[allow]`, `# noqa`, `# type: ignore`, `eslint-disable`, `#pragma warning disable`, `@ts-ignore`) MUST be zero unless each carries a `RULE-` or issue reference (P07). Enforced by `lint`. The same rule applies to security-scanner suppressions (`nosemgrep`, `nosec`, `gitleaks:allow`, …); enforced by the `security` layer (P11, SEC-148).
 - Skipped, pending, or expected-failure tests MUST reference an open issue. Enforced by `unit`.
 - No test file MAY be deleted or have assertions removed without SPEC amendment. Enforced by `unit` (assertion-count ratchet) and P06.
 - Thresholds MUST NOT be lowered by the agent. Enforced by P06 — `layers.yaml` is a protected path.

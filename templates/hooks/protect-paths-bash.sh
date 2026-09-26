@@ -3,7 +3,7 @@
 set -euo pipefail
 input=$(cat)
 cmd=$(echo "$input" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("tool_input",{}).get("command",""))' 2>/dev/null || true)
-if echo "$cmd" | grep -qE '(>|>>|tee|sed -i|mv |cp |rm |git checkout --|git restore)\s.*(spec/|gauntlet/|traced/golden/|rules/|scoring/|\.github/workflows/|AGENTS\.md|CLAUDE\.md|CODEOWNERS)'; then
+if echo "$cmd" | grep -qE '(>|>>|tee|sed -i|mv |cp |rm |git checkout --|git restore)\s.*(spec/|gauntlet/|traced/golden/|rules/|principles/|decisions/|security/|scoring/|\.github/workflows/|AGENTS\.md|CLAUDE\.md|CODEOWNERS|\.semgrepignore|\.gitleaks|\.trivyignore|osv-scanner\.toml|\.snyk|\.nsprc|audit-ci\.json|deny\.toml|zap-rules\.tsv)'; then
   echo "crivo P06: command writes to a protected path." >&2
   exit 2
 fi

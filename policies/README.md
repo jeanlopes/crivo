@@ -12,5 +12,6 @@
 | [P08](P08-docs-linkage.md) | Docs linkage | `docs` layer, judge |
 | [P09](P09-nondeterministic.md) | Non-deterministic components | `llm-eval` layer |
 | [P10](P10-architecture-decisions.md) | Architecture decisions | `architecture` layer; `principles/`, `decisions/` |
+| [P11](P11-security.md) | Security | `security` layer, `adversary` security pass; `security/` |
 
 Language: RFC 2119. Every normative statement names its enforcement mechanism. If it cannot, it is not a policy.

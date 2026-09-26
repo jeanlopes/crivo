@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jeanlopes/crivo/security/finding.schema.json",
+  "title": "crivo security finding (P11, security/REVIEW.md)",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "kind", "control", "severity", "location", "attack", "impact", "proposed_test", "status"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^F-[0-9]+$" },
+      "kind": { "enum": ["vulnerability", "weak-test", "spec-gap", "injection-attempt"] },
+      "control": { "type": "string", "pattern": "^SEC-[0-9]{3}$" },
+      "cwe": { "type": "string", "pattern": "^CWE-[0-9]+$" },
+      "severity": { "enum": ["critical", "high", "medium", "low"] },
+      "location": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file"],
+        "properties": {
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "entry_point": { "type": "string", "description": "Route, action, job or tool the attack goes through" }
+        }
+      },
+      "attack": { "type": "string", "minLength": 20, "description": "The concrete request or sequence an attacker sends" },
+      "impact": { "type": "string", "minLength": 10, "description": "What the attacker obtains, whose data, how many users" },
+      "preconditions": { "type": "string", "description": "Account needed, tenant, user interaction, network position" },
+      "proposed_test": { "type": "string", "minLength": 10, "description": "Gherkin @security scenario or test that fails before the fix" },
+      "proposed_fix": { "type": "string" },
+      "confidence": { "enum": ["confirmed", "likely", "possible"] },
+      "status": { "enum": ["unresolved", "resolved", "accepted"] },
+      "resolution": {
+        "type": "string",
+        "description": "resolved: commit and test id. accepted: issue reference and spec/security/exceptions.yaml entry"
+      }
+    },
+    "allOf": [
+      {
+        "if": { "properties": { "status": { "enum": ["resolved", "accepted"] } } },
+        "then": { "required": ["resolution"] }
+      }
+    ]
+  }
+}

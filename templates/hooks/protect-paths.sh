@@ -2,7 +2,7 @@
 # Claude Code PreToolUse hook (P06). Reads the tool call JSON on stdin,
 # exits 2 (block) if the target path is protected. Also usable as a git pre-commit check.
 set -euo pipefail
-PROTECTED_REGEX='^(spec/|gauntlet/|traced/golden/|rules/|scoring/|\.github/workflows/|AGENTS\.md$|CLAUDE\.md$|CODEOWNERS$|\.pre-commit-config\.yaml$)'
+PROTECTED_REGEX='^(spec/|gauntlet/|traced/golden/|rules/|principles/|decisions/|security/|scoring/|\.github/workflows/|AGENTS\.md$|CLAUDE\.md$|CODEOWNERS$|\.pre-commit-config\.yaml$|(.*/)?(\.semgrepignore|\.gitleaks\.toml|\.gitleaksignore|\.trivyignore[^/]*|osv-scanner\.toml|\.snyk|\.nsprc|audit-ci\.json[^/]*|deny\.toml|zap-rules\.tsv)$)'
 
 if [[ -t 0 ]]; then
   # git pre-commit mode: check staged files

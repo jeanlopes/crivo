@@ -1,0 +1,14 @@
+# crivo custom rules for JSX/TSX (P11).
+rules:
+  - id: crivo.sec-016.dangerously-set-inner-html
+    message: dangerouslySetInnerHTML with unsanitized content (SEC-016). Sanitize with DOMPurify and reference a RULE-.
+    severity: ERROR
+    languages: [typescript]
+    metadata: { control: SEC-016, cwe: "CWE-79" }
+    patterns:
+      - pattern: '<$EL dangerouslySetInnerHTML={{__html: $X}} />'
+      - metavariable-pattern:
+          metavariable: $X
+          patterns:
+            - pattern-not: DOMPurify.sanitize(...)
+            - pattern-not: sanitize(...)

@@ -1,0 +1,79 @@
+# crivo custom rules for Python (P11). Each rule id carries the SEC- control it enforces.
+rules:
+  - id: crivo.sec-001.sql-built-from-strings
+    message: SQL built by string formatting (SEC-001). Pass parameters separately to execute().
+    severity: ERROR
+    languages: [python]
+    metadata: { control: SEC-001, cwe: "CWE-89" }
+    pattern-either:
+      - pattern: $CUR.execute(f"...", ...)
+      - pattern: $CUR.execute("..." % $X, ...)
+      - pattern: $CUR.execute("..." + $X, ...)
+      - pattern: $CUR.execute("...".format(...), ...)
+      - pattern: text(f"...")
+      - pattern: $DB.raw(f"...", ...)
+
+  - id: crivo.sec-003.shell-with-input
+    message: Shell invoked with a built command (SEC-003). Use subprocess.run([...]) without shell=True.
+    severity: ERROR
+    languages: [python]
+    metadata: { control: SEC-003, cwe: "CWE-78" }
+    patterns:
+      - pattern-either:
+          - pattern: subprocess.$F($CMD, ..., shell=True, ...)
+          - pattern: os.system($CMD)
+          - pattern: os.popen($CMD, ...)
+      - pattern-not: subprocess.$F("...", ..., shell=True, ...)
+      - pattern-not: os.system("...")
+
+  - id: crivo.sec-005.unsafe-deserialization
+    message: Deserialization of object graphs (SEC-005). Use JSON with a schema, or yaml.safe_load.
+    severity: ERROR
+    languages: [python]
+    metadata: { control: SEC-005, cwe: "CWE-502" }
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: pickle.load(...)
+          - pattern: yaml.load(...)
+          - pattern: yaml.unsafe_load(...)
+      - pattern-not: yaml.load(..., Loader=yaml.SafeLoader, ...)
+      - pattern-not: yaml.load(..., Loader=yaml.CSafeLoader, ...)
+
+  - id: crivo.sec-050.credential-in-url
+    message: Credential-like parameter in a URL (SEC-050). Hand off with a one-time code exchanged server-side.
+    severity: ERROR
+    languages: [python]
+    metadata: { control: SEC-050, cwe: "CWE-598" }
+    pattern-regex: '[?&#](access_token|id_token|refresh_token|token|jwt|session|session_id|sessionid|api_key|apikey|password)='
+
+  - id: crivo.sec-051.jwt-not-verified
+    message: JWT decoded without signature verification or with 'none' allowed (SEC-051).
+    severity: ERROR
+    languages: [python]
+    metadata: { control: SEC-051, cwe: "CWE-347" }
+    pattern-either:
+      - pattern: 'jwt.decode(..., options={..., "verify_signature": False, ...}, ...)'
+      - pattern: 'jwt.decode(..., algorithms=[..., "none", ...], ...)'
+
+  - id: crivo.sec-068.tls-verification-disabled
+    message: TLS certificate verification disabled (SEC-068).
+    severity: ERROR
+    languages: [python]
+    metadata: { control: SEC-068, cwe: "CWE-295" }
+    pattern-either:
+      - pattern: requests.$M(..., verify=False, ...)
+      - pattern: httpx.$M(..., verify=False, ...)
+      - pattern: httpx.Client(..., verify=False, ...)
+      - pattern: httpx.AsyncClient(..., verify=False, ...)
+
+  - id: crivo.sec-070.insecure-random-secret
+    message: random module used for a security value (SEC-070). Use the secrets module.
+    severity: ERROR
+    languages: [python]
+    metadata: { control: SEC-070, cwe: "CWE-338" }
+    patterns:
+      - pattern: $V = <... random.$F(...) ...>
+      - metavariable-regex:
+          metavariable: $V
+          regex: (?i).*(token|secret|nonce|otp|code|salt|passw|key|session|invite|reset).*

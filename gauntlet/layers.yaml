@@ -146,7 +146,66 @@ layers:
 
   - id: security
     kind: gate
-    checks: [sast, secrets, dependency_audit]
+    after: e2e                      # headers, dast and fuzz run against the e2e deployment
+    description: Security controls catalogue (P11, security/). Each check realizes a `verify:` mechanism of SEC-nnn controls.
+    catalogue: security
+    level: 2                        # P11 adoption level; MUST be >= 2 for projects that process personal data
+    checks_by_level:
+      1: [sast, secrets, sca, suppressions, catalogue, headers]
+      2: [sbom, iac, ci, dast, fuzz, abuse]
+      3: [dast_active, secrets_full_history]
+    sast_rules:                     # registry rulesets from the adapter, plus:
+      - security/semgrep
+    sensitive_paths:                # trigger 2; projects MAY add
+      - "**/*auth*"
+      - "**/*session*"
+      - "**/*token*"
+      - "**/*password*"
+      - "**/*mfa*"
+      - "**/*oauth*"
+      - "**/*permission*"
+      - "**/*policy*"
+      - "**/*tenant*"
+      - "**/*rls*"
+      - "**/*crypto*"
+    triggers:                       # 1-6 are mandatory; projects MAY add, MUST NOT remove (P11)
+      - entry_point_change
+      - sensitive_path_change
+      - new_sink                    # detected by the sink_inventory rules
+      - dependency_or_third_party_script_change
+      - browser_policy_change       # CORS, CSP, cookies, headers, redirects, CSRF
+      - personal_data_or_file_path_change
+      - infrastructure_or_ci_change
+      - nondeterministic_component_change
+    thresholds:
+      block_severity: [critical, high]
+      block_known_exploited: true   # CISA KEV blocks regardless of severity
+      dependency_min_age_days: 7    # SEC-096
+      remediation_days: { critical: 7, high: 30, medium: 90 }
+      exception_max_days: 90
+    rules:
+      threat_model_required_on_trigger: true
+      triggered_domains_have_verdicts: true
+      abuse_scenario_per_triggered_domain: true
+      authz_matrix_cells_tested: true         # SEC-062
+      public_routes_match_manifest: true      # SEC-035
+      config_evidence_links_resolve: true
+      suppressions_require_reference: true    # SEC-148
+      lockfile_required: true                 # SEC-094
+      install_scripts_disabled: true          # SEC-097
+      actions_pinned_by_sha: true             # SEC-100
+      expired_remediation_fails: true         # exposure-time ratchet, P11
+      expired_exception_fails: true
+    checks:
+      - security/check.sh
+      - security/checks/suppressions.sh
+      - security/checks/headers.sh
+    emits:
+      - findings_by_severity
+      - sbom
+      - control_coverage            # applicable controls with a passing mechanism / applicable controls
+      - open_exceptions
+      - overdue_findings
 
   - id: llm-eval
     kind: gradient
@@ -167,15 +226,24 @@ layers:
     separate_context: true
     read_only: true
     prefer_different_model: true
+    passes:
+      - code
+      - security                    # on any P11 trigger; protocol security/REVIEW.md
+    security_protocol: security/REVIEW.md
+    security_output_schema: security/finding.schema.json
 
 schedule:
   nightly:
     - { id: mutation, scope: full }
     - { id: llm-eval, opts: { pr_subset: 1.0 } }
+    - { id: security, checks: [sca, secrets_full_history, fuzz], scope: full }   # opens issues with P11 deadlines
+    - { id: security, checks: [dast_active], target: staging, min_level: 3 }
   weekly:
     - comment_judge_stale_suspects
     - doc_judge_stale_suspects
+    - { id: security, checks: [headers], target: production_inventory }        # SEC-114
   quarterly:
+    - security_catalogue_review             # new OWASP/CWE/CISA publications, new cases, expired exceptions
     - comment_judge_random_sample_10pct
     - recalibrate_weights
     - architecture_boundary_review          # AP-070; outcome is an ADR, including "nothing changed"
