@@ -49,6 +49,7 @@ principles/   90 architecture principles, AP-001–AP-090, by axis of decision
 decisions/    ADR registry and template — the record P10 gates
 security/     152 security controls, SEC-001–SEC-152, by domain; attacks index, cases, review protocol, semgrep rules, checks — P11
 comments/     banned phrases, judge output schema
+skills/       agent skills (e.g. /acmt, agent-conducted manual testing) — guide in docs/guides/
 templates/    AGENTS.md, CI workflow, protected-path hooks, CODEOWNERS
 rationale/    why — essays, not policy
 ```
