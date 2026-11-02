@@ -147,7 +147,7 @@ A skill vive em [`skills/acmt/`](../../skills/acmt/) neste repositório (fonte d
 
 ```powershell
 # Windows (PowerShell), a partir da raiz do crivo
-Copy-Item -Recurse -Force skillscmt $HOME\.claude\skillscmt
+Copy-Item -Recurse -Force skills\acmt $HOME\.claude\skills\acmt
 ```
 
 Depois abra uma sessão nova do Claude Code e use `/acmt`. Ao mudar a skill, edite **aqui**, passe pelo PR e reinstale; a cópia em `~/.claude` nunca é editada à mão.
