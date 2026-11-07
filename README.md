@@ -50,6 +50,7 @@ decisions/    ADR registry and template — the record P10 gates
 security/     152 security controls, SEC-001–SEC-152, by domain; attacks index, cases, review protocol, semgrep rules, checks — P11
 comments/     banned phrases, judge output schema
 skills/       agent skills (e.g. /acmt, agent-conducted manual testing) — guide in docs/guides/
+docs/guides/ guides: manual testing led by an agent (ACMT) and [fast test suites](docs/guides/suites-de-teste-rapidas.md) — measured practices and lessons
 templates/    AGENTS.md, CI workflow, protected-path hooks, CODEOWNERS
 rationale/    why — essays, not policy
 ```
